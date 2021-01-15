@@ -12,6 +12,16 @@ namespace Game.States.Tools
     {
         protected Network network { get { return owner.owner.network; } set { owner.owner.network = value; } }
 
+        protected GameObject Instantiate(GameObject obj, Vector3 pos)
+        {
+            return owner.owner.Instantiate(obj, pos);
+        }
+        
+        protected void DestroyObj(GameObject obj)
+        {
+            owner.owner.DestroyObj(obj);
+        }
+
         public override void Update() 
         {
             base.Update();

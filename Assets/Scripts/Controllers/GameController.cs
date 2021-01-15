@@ -13,12 +13,11 @@ public class GameController : MonoBehaviour
 {
     [Header("UI Refrences")]
     // Tools UI
-    public Callback facilityOptions;
+    public EntityCallback facilityOptions;
 
     [Header("Objects References")]
     public Network network;
 
-    // TODO: Pass on self to the state machine in order to allow for states to modify world
     private StateMachine facilitiesStates;
     
     private Vector3 mouseStart;
@@ -32,24 +31,9 @@ public class GameController : MonoBehaviour
         facilityOptions.clickEvent += OnFacilityClick;
     }
 
-    private void OnFacilityClick(object sender, InfoEventArgs<int> e)
+    private void OnFacilityClick(object sender, InfoEventArgs<Entity> e)
     {
-        switch (e.info)
-        {
-            case 0:
-                //Mix Use Commercial
-                facilitiesStates.Switch(new ApartmentFacilityState());
-                break;
-
-            case 1:
-                //Park
-                facilitiesStates.Switch(new ParkFacilityState());
-                break;
-
-            default:
-                //facilitiesStates.Switch(new DefaultToolState());
-                break;
-        }
+        facilitiesStates.Switch(new EntityPlacementState(e.info));
     }
 
     private void Update() {
@@ -58,5 +42,15 @@ public class GameController : MonoBehaviour
 
     private void OnDestroy() {
         facilityOptions.clickEvent -= OnFacilityClick;
+    }
+
+    public GameObject Instantiate(GameObject prefab, Vector3 pos)
+    {
+        return Instantiate(prefab, pos, Quaternion.Euler(0, 0, 0));
+    }
+
+    public void DestroyObj(GameObject obj)
+    {
+        Destroy(obj);
     }
 }
