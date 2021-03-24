@@ -14,34 +14,47 @@ public class GameController : MonoBehaviour
     [Header("UI Refrences")]
     // Tools UI
     public EntityCallback facilityOptions;
+    public Callback endTurnCallback;
 
     [Header("Objects References")]
-    public Network network;
+    public Neighbourhood neighbourhood;
+    public NetworkManager networkManager;
+    public GameUI gameUI;
 
-    private StateMachine facilitiesStates;
+    public StateMachine machine;
     
     private Vector3 mouseStart;
 
     private void Start() {
 
-        facilitiesStates = new StateMachine(this);
+        machine = new StateMachine(this);
         // Default tool which doesn't do anything when left clicking
-        facilitiesStates.Switch(new DefaultToolState());
+        machine.Switch(new LockGameState());
 
         facilityOptions.clickEvent += OnFacilityClick;
     }
 
     private void OnFacilityClick(object sender, InfoEventArgs<Entity> e)
     {
-        facilitiesStates.Switch(new EntityPlacementState(e.info));
+        machine.Switch(new EntityPlacementState(e.info));
     }
 
     private void Update() {
-        facilitiesStates.Update();
+        machine.Update();
     }
 
     private void OnDestroy() {
         facilityOptions.clickEvent -= OnFacilityClick;
+    }
+
+    public void LockGame()
+    {
+        gameUI.Lock();
+    }
+    
+    public void UnlockGame()
+    {
+        gameUI.Unlock();
     }
 
     public GameObject Instantiate(GameObject prefab, Vector3 pos)

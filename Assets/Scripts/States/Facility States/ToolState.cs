@@ -10,7 +10,7 @@ namespace Game.States.Tools
     //Doesn't do anything
     public class ToolState : State
     {
-        protected Network network { get { return owner.owner.network; } set { owner.owner.network = value; } }
+        protected Neighbourhood neighbourhood { get { return owner.owner.neighbourhood; } set { owner.owner.neighbourhood = value; } }
 
         protected GameObject Instantiate(GameObject obj, Vector3 pos)
         {
@@ -43,6 +43,7 @@ namespace Game.States.Tools
             }
 
         }
+        
         protected virtual void OnLeftClick()
         {
             

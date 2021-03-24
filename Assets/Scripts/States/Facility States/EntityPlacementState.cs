@@ -11,9 +11,11 @@ namespace Game.States.Tools
     {
         private Entity entity;
         private GameObject marker;
+        private Plane plane;
 
         public EntityPlacementState(Entity e)
         {
+            plane = new Plane(Vector3.up, Vector3.zero);
             entity = e;
         }
 
@@ -23,19 +25,23 @@ namespace Game.States.Tools
             Debug.Log("Now placing: " + entity.entityName);
             
             Vector3 mp = GetMouseWorldPos();
-            marker = Instantiate(entity.prefab, mp);
-            marker.GetComponent<Marker>().color = entity.color;
+            marker = Instantiate(entity.prefabs[0], mp);
+            //marker.GetComponent<Marker>().color = entity.color;
         }
 
         public override void Update() 
         {
             base.Update();
-
-            Vector3 mp = GetMouseWorldPos();
-            marker.transform.position = mp;
             
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
+            float enter;
+
+            if(plane.Raycast(ray, out enter))
+            {
+                Vector3 hitPoint = ray.GetPoint(enter) + Vector3.up * 0.5f;
+                marker.transform.position = hitPoint;
+            }
 
             if (Physics.Raycast(ray, out hit)) {
                 Block block = hit.transform.GetComponent<Block>();
@@ -53,6 +59,9 @@ namespace Game.States.Tools
 
         protected override void OnLeftClick() 
         {
+            if(!owner.owner.networkManager.connected)
+                return;
+            
             //Raycast for block
             //If hit block get the block 
             //Add icon to the blockRaycastHit hit;
@@ -64,7 +73,17 @@ namespace Game.States.Tools
 
             if (Physics.Raycast(ray, out hit)) {
                 Block block = hit.transform.GetComponent<Block>();
-                block.AddEntity(entity);
+
+                if(block.occupied)
+                    return;
+
+                neighbourhood.Build(block.id, entity);
+    
+                //Temp placement
+                DestroyObj(marker);
+                owner.owner.networkManager.SendBuild(block.id, entity.id);
+                owner.owner.networkManager.EndTurn();
+                owner.Switch(new LockGameState());
             }
 
         }
@@ -73,7 +92,7 @@ namespace Game.States.Tools
         {
             //network.ApartmentHide();
             DestroyObj(marker);
-            owner.Switch(new DefaultToolState());
+            owner.Switch(new PlayerTurnState());
         }
 
         public override void Exit()

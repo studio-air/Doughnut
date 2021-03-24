@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum RESIDENTIAL_DENSITY
+public enum PREFAB_DENSITY
 {
-    NONE = 0,
+    UNIQUE = 0,
     LOW = 1,
     MID = 2,
     HIGH = 3
@@ -23,12 +23,10 @@ public class Entity : ScriptableObject
 {
     public string entityName;
 
-    public Color color;
+    public string id;
 
-    public GameObject prefab;
-
-    public RESIDENTIAL_DENSITY minDensity;
-    public RESIDENTIAL_DENSITY maxDensity;
+    public PREFAB_DENSITY prefabDensity;
+    public GameObject[] prefabs;
 
     public Affects[] affects;
 }
